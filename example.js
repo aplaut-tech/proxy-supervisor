@@ -3,7 +3,7 @@
 const http = require("http");
 const { resolve } = require("path");
 const fs = require("fs");
-const supervisor = require("../");
+const supervisor = require("./");
 
 const proxies = fs
   .readFileSync(resolve(__dirname, "proxy.txt"), "utf-8")
@@ -29,11 +29,11 @@ if (balancer.proxies.size === 0) {
   process.exit(1);
 }
 
-const { monitor } = require("../");
-balancer.subscribe(monitor({ target: "/", host:'tinyproxy.stats', interval: 5*1000 }));
+const { monitor } = require("./");
+balancer.subscribe(monitor({ target: "/", host:"tinyproxy.stats", interval: 5*1000 }));
 
 http
-  .createServer(balancer.proxy())
+  .createServer()
   .on("connect", balancer.connect())
   .listen(9999, () => {
     console.log("Proxy supervisor listening on port 9999");
