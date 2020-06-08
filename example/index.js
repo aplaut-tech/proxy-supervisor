@@ -29,21 +29,12 @@ if (balancer.proxies.size === 0) {
   process.exit(1);
 }
 
-balancer.subscribe(supervisor.monitor({ target: "http://localhost:9998" }));
+const { monitor } = require("../");
+balancer.subscribe(monitor({ target: "/", host:'tinyproxy.stats', interval: 5*1000 }));
 
 http
   .createServer(balancer.proxy())
   .on("connect", balancer.connect())
   .listen(9999, () => {
     console.log("Proxy supervisor listening on port 9999");
-  });
-
-http
-  .createServer((req, res) => {
-    res.writeHead(200);
-    res.end();
-  })
-  .listen(9998, () => {
-    console.log("Proxy validator listening on port 9998");
-    console.log("Please, make sure port is open or disable monitor");
   });
